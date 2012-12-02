@@ -1,4 +1,4 @@
-fin.returns.summary <- function(symbol = c("msft", "goog"), from="2005-09-01", to=Sys.Date()) {
+rfin.returns.get <- function(symbol = c("msft", "goog"), from="2005-09-01", to=Sys.Date()) {
 	#..........................................................
 	#
 	#  Returns continuously compounded monthly returns and
@@ -37,20 +37,32 @@ fin.returns.summary <- function(symbol = c("msft", "goog"), from="2005-09-01", t
 	)
 }
 
-fin.returns.estimate <- function(returns, type=c("monthly", "annual")) {
+rfin.returns.plot <- function(returns, col="blue", title="CC returns") {
+	#..........................................................
+	#
+	#  Plots the returns.
+	#
+	#..........................................................
+	horizontal.line.panel <- function(...) {
+	  lines(...)
+	  abline(h=0, col="grey")
+	}
+	plot(returns, lwd=2, panel=horizontal.line.panel, col=col, main=title, xlab="")
+}
+
+rfin.returns.estimate <- function(returns, type=c("monthly", "annual")) {
 	#..........................................................
 	#
 	#  Computes the Constant Expected Return estimates 
 	#  for the given list of continuously compounded returns.
 	#
 	#..........................................................
+	returns.covar <- var(returns)
+	returns.corr <- cor(returns)
+
         hat.mean <- apply(returns, 2, mean)
 	hat.sd = apply(returns, 2, sd)
 	hat.var = apply(returns, 2, var)
-
-	returns.covar <- var(returns)
-	returns.corr <- cor(returns)
-	
 	hat.covar <- returns.covar[lower.tri(returns.covar)]
 	hat.corr <- returns.corr[lower.tri(returns.corr)]
 
