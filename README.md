@@ -1,0 +1,4 @@
+rfinance
+========
+
+Finance toolkit
