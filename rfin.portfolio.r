@@ -1,4 +1,4 @@
-rfin.portfolio.create <- function(estimations, type=c("min.variance", "tangency"), risk.free.rate = 0.03, weights=NA, desired.return=NA) {
+rfin.portfolio.create <- function(estimations, type=c("min.variance", "tangency"), risk.free.return = 0.03, weights=NA, desired.return=NA) {
 	#..........................................................
 	#
 	#  Creates a portfolio for the given CER estimations.
@@ -8,12 +8,12 @@ rfin.portfolio.create <- function(estimations, type=c("min.variance", "tangency"
 	expected.covariance <- estimations$covar$matrix
 	
 	if (is.na(weights)) {
-		weights <- rfin.portfolio.getWeights(expected.returns, expected.covariance, type, risk.free.rate, desired.return)
+		weights <- rfin.portfolio.getWeights(expected.returns, expected.covariance, type, risk.free.return, desired.return)
 	}
 
 	return <- as.numeric(weights %*% expected.returns)
 	standard.deviation <- as.numeric(sqrt(t(weights) %*% expected.covariance %*% weights))
-       	sharpe.ratio <- as.numeric((return - risk.free.rate)/standard.deviation)
+       	sharpe.ratio <- as.numeric((return - risk.free.return)/standard.deviation)
 
 	list (
 		weights = weights, 
@@ -24,21 +24,21 @@ rfin.portfolio.create <- function(estimations, type=c("min.variance", "tangency"
 	)
 }
 
-rfin.portfolio.plot <- function(portfolio, risk.free.rate=0.03, grid=list(from=-0.5, to=1.5, length=30)) {
+rfin.portfolio.plot <- function(portfolio, risk.free.return=0.03, grid=list(from=-0.5, to=1.5, length=30), col="orange", title="Portfolio and Efficient Frontier") {
 	#..........................................................
 	#
 	#  Plots risk/return of the given portfolio along with efficient frontier.
 	#
 	#..........................................................
-	efficient.frontier = rfin.portfolio.getEfficientFrontier(portfolio$input, risk.free.rate, grid)
+	efficient.frontier = rfin.portfolio.getEfficientFrontier(portfolio$input, risk.free.return, grid)
 
      	y.lim = c(0,max(efficient.frontier$returns, portfolio$return))
 	x.lim = c(0,max(efficient.frontier$risks, portfolio$risk))
-     	plot(efficient.frontier$risks, efficient.frontier$returns, type="b", xlim=x.lim, ylim=y.lim, xlab=expression(sigma[p]), ylab=expression(mu[p]),  main="Portfolio and Efficient Frontier", col="orange", lwd=2)
+     	plot(efficient.frontier$risks, efficient.frontier$returns, type="b", xlim=x.lim, ylim=y.lim, xlab=expression(sigma[p]), ylab=expression(mu[p]),  main=title, col=col, lwd=2)
 	points(portfolio$risk, portfolio$return, type="b", col="blue", pch=20)
 }
 
-rfin.portfolio.getEfficientFrontier <- function(estimations, risk.free.rate, grid) {
+rfin.portfolio.getEfficientFrontier <- function(estimations, risk.free.return, grid) {
 	#..........................................................
 	#
 	#  Returns efficient frontier for the given estimated asset returns.
@@ -51,7 +51,7 @@ rfin.portfolio.getEfficientFrontier <- function(estimations, risk.free.rate, gri
 	expected.returns <- estimations$assets[,"mean"]
 	portfolio.min.variance <- list(
 		global = rfin.portfolio.create(estimations, type="min.variance"),
-		max.return = rfin.portfolio.create(estimations, type="min.variance", risk.free.rate=risk.free.rate, desired.return=max(expected.returns))
+		max.return = rfin.portfolio.create(estimations, type="min.variance", risk.free.return=risk.free.return, desired.return=max(expected.returns))
 	)
 
 	# combinations of the two above portfolios would create efficient frontier
@@ -73,7 +73,7 @@ rfin.portfolio.getEfficientFrontier <- function(estimations, risk.free.rate, gri
 	)
 }
 
-rfin.portfolio.getWeights <- function(expected.returns, covar.matrix, type=c("min.variance", "tangency"), risk.free.rate, desired.return = NA) {
+rfin.portfolio.getWeights <- function(expected.returns, covar.matrix, type=c("min.variance", "tangency"), risk.free.return, desired.return = NA) {
 	#..........................................................
 	#
 	#  Computes the weights for a portfolio.
@@ -128,7 +128,7 @@ rfin.portfolio.getWeights <- function(expected.returns, covar.matrix, type=c("mi
 		}
 		else if (type == "tangency") {
 			covar.inv <- solve(covar.matrix)
-  			weights <- covar.inv %*% (expected.returns - risk.free.rate) 
+  			weights <- covar.inv %*% (expected.returns - risk.free.return) 
 			result <- as.vector(weights/sum(weights))	# normalize weights
 		}
 	}
@@ -137,7 +137,7 @@ rfin.portfolio.getWeights <- function(expected.returns, covar.matrix, type=c("mi
 	result
 }
 
-rfin.portfolio.suggest <- function(portfolio, desired.risk, risk.free.rate = 0.03) {
+rfin.portfolio.suggest <- function(portfolio, desired.risk, risk.free.return = 0.03) {
 	#..........................................................
 	#
 	#  Suggests an efficient (min variance) portfolio for the given level of risk.
@@ -146,7 +146,7 @@ rfin.portfolio.suggest <- function(portfolio, desired.risk, risk.free.rate = 0.0
 	#
 	#..........................................................
 	risk.investment = coredata(desired.risk/portfolio$risk)  #volume of risk investment
-	return = risk.free.rate + risk.investment*(portfolio$return - risk.free.rate)
+	return = risk.free.return + risk.investment*(portfolio$return - risk.free.return)
 	list (
 		risk.free.investment = 1 - risk.investment,
 		risk = desired.risk,
