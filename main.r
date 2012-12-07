@@ -13,15 +13,15 @@ data <- rfin.returns.get(symbols="ba,msft,sbux,aapl", from="2010-01-01")
 rfin.returns.plot(data$returns)
 
 #.....................................................
+#estimate the returns
+estimates <- rfin.returns.estimate(data$returns, type="annual")
+estimates$assets
+
+#.....................................................
 #calculate 5% VaR (and its error) for $30M investment in MSFT
 VaR <- rfin.returns.VaR(data$returns[,"msft"], p=0.05, wealth=30)   #!!!!!!!!check against PerformanceAnalytics.VaR(returns, p=.95, method="gaussian") ??
 VaR$value
 VaR$error
-
-#.....................................................
-#estimate the returns
-estimates <- rfin.returns.estimate(data$returns, type="annual")
-estimates$assets
 
 #.....................................................
 #create and plot "min variance" portfolio

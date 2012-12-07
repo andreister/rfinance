@@ -56,7 +56,7 @@ rfin.returns.plot <- function(returns, col="blue", title="CC returns") {
 	plot(returns, lwd=2, panel=horizontal.line.panel, col=col, main=title, xlab="")
 }
 
-rfin.returns.VaR <- function(ccreturns, p=0.05, wealth=1) {
+rfin.returns.VaR <- function(cc.returns, p=0.05, wealth=1) {
 	#..........................................................
 	#
 	#  Computes value at risk for the given investment in the asset: with the given
@@ -72,7 +72,7 @@ rfin.returns.VaR <- function(ccreturns, p=0.05, wealth=1) {
 		q <- mean(data[idx]) + sd(data[idx])*qnorm(p)
 		exp(q) - 1
 	}
-	result <- boot(data=ccreturns, statistic=var.bootstrap, R=999)
+	result <- boot(data=cc.returns, statistic=var.bootstrap, R=999)
 
 	list (
 		value = result$t0*wealth,
@@ -80,23 +80,23 @@ rfin.returns.VaR <- function(ccreturns, p=0.05, wealth=1) {
 	)
 }
  
-rfin.returns.estimate <- function(ccreturns, type=c("monthly", "annual")) {
+rfin.returns.estimate <- function(cc.monthly.returns, type=c("monthly", "annual")) {
 	#..........................................................
 	#
 	#  Computes the Constant Expected Return estimates 
-	#  for the given list of continuously compounded returns.
+	#  for the given list of continuously compounded monthly returns.
 	#
 	#..........................................................
-	returns.covar <- var(ccreturns)
-	returns.corr <- cor(ccreturns)
+	returns.covar <- var(cc.monthly.returns)
+	returns.corr <- cor(cc.monthly.returns)
 
-        hat.mean <- apply(ccreturns, 2, mean)
-	hat.sd = apply(ccreturns, 2, sd)
-	hat.var = apply(ccreturns, 2, var)
+        hat.mean <- apply(cc.monthly.returns, 2, mean)
+	hat.sd = apply(cc.monthly.returns, 2, sd)
+	hat.var = apply(cc.monthly.returns, 2, var)
 	hat.covar <- returns.covar[lower.tri(returns.covar)]
 	hat.corr <- returns.corr[lower.tri(returns.corr)]
 
-	nobs <- nrow(ccreturns)
+	nobs <- nrow(cc.monthly.returns)
 	hat.mean.error <- hat.sd/sqrt(nobs)
 	hat.sd.error <- hat.sd/sqrt(2*nobs)
 	hat.var.error <- hat.var/sqrt(nobs/2)

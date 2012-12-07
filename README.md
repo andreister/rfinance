@@ -1,4 +1,4 @@
-## Returns plotting, estimation, etc.
+## Prices and returns
 
 Get prices and returns, plot the returns:
 ```r
@@ -6,18 +6,7 @@ data <- rfin.returns.get(symbols="ba,msft,sbux,aapl", from="2010-01-01")
 rfin.returns.plot(data$returns)
 ```
 
-Calculate 5% VaR and its error for $30M investment in MSFT:
-```r
-VaR <- rfin.returns.VaR(data$returns[,"msft"], p=0.05, wealth=30)
-```
-```
-VaR$value
-[1] -3.073379
-VaR$error
-[1] 0.4703777
-```
-
-Estimate the returns:
+Estimate the returns. Uses the standard error formulas:
 ```r
 estimates <- rfin.returns.estimate(data$returns, type="annual")
 ```
@@ -29,6 +18,19 @@ msft 0.007521374  0.1340554 0.2289432 0.02736395 0.05241501 0.01252958
 sbux 0.324034382  0.1388951 0.2372085 0.02835184 0.05626786 0.01345059
 aapl 0.362029000  0.1384465 0.2364424 0.02826027 0.05590499 0.01336385
 ```
+
+Calculate 5% VaR and its error for $30M investment in MSFT. Asssumes normal distribution of the continuosly compounded returns, so VaR is estimated as a quantile of a standard normal, and the estimation error is reported as well:
+```r
+msft <- data$returns[,"msft"]
+VaR <- rfin.returns.VaR(msft, p=0.05, wealth=30)
+```
+```
+VaR$value
+[1] -3.073379
+VaR$error
+[1] 0.4703777
+```
+
 
 ## Portfolio theory
 
