@@ -8,7 +8,7 @@ set.seed(123)
 
 #.....................................................
 #get prices and returns
-source(file="rfin.returns.r")
+source(file="rfin/returns.r")
 data <- rfin.returns.get(symbols="ba,msft,sbux,aapl", from="2010-01-01")
 rfin.returns.plot(data$returns)
 
@@ -25,7 +25,7 @@ VaR$error
 
 #.....................................................
 #create and plot "min variance" portfolio
-source(file="rfin.portfolio.r")
+source(file="rfin/portfolio.r")
 portfolio.min.var <- rfin.portfolio.create(estimates, type="min.variance", risk.free.return=0.03)
 portfolio.min.var$risk
 portfolio.min.var$return
