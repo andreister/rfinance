@@ -4,6 +4,7 @@
 #
 # .....................................................................
 options(digits=4, width=70)
+set.seed(123)
 
 #.....................................................
 #get prices and returns
@@ -19,12 +20,12 @@ VaR$error
 
 #.....................................................
 #estimate the returns
-source(file="rfin.portfolio.r")
 estimates <- rfin.returns.estimate(data$returns, type="annual")
 estimates$assets
 
 #.....................................................
-#create and plot "min variance" portfolio, calculate its 5% VaR
+#create and plot "min variance" portfolio
+source(file="rfin.portfolio.r")
 portfolio.min.var <- rfin.portfolio.create(estimates, type="min.variance", risk.free.return=0.03)
 portfolio.min.var$risk
 portfolio.min.var$return
