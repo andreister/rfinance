@@ -5,6 +5,7 @@ Get prices and returns, plot the returns:
 data <- rfin.returns.get(symbols="ba,msft,sbux,aapl", from="2010-01-01")
 rfin.returns.plot(data$returns)
 ```
+![ccreturns](https://raw.github.com/andreister/rfinance/master/ccreturns.png)
 
 Estimate the returns. Uses the standard error formulas:
 ```r
@@ -38,6 +39,10 @@ Create and plot an efficient portfolio with 30% annual return, print out its wei
 ```r
 portfolio30 <- rfin.portfolio.create(estimates, risk.free.return=0.03, desired.return=0.3)
 rfin.portfolio.plot(portfolio30)
+```
+![frontier](https://raw.github.com/andreister/rfinance/master/frontier.png)
+
+```r
 portfolio30$weights
 ```
 ```
