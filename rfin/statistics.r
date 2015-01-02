@@ -4,6 +4,9 @@ rfin.statistics.fit <- function (x, y, model=c('linear', 'exponential', 'logisti
   #  Fits a linear/exponential/logistic model into given data.
   #
   #..........................................................
+  xlab = deparse(substitute(x))
+  ylab = deparse(substitute(y))
+                 
   x <- as.numeric(x)
   y <- as.numeric(y)
   y[y == 0] <- 1e-09
@@ -21,6 +24,8 @@ rfin.statistics.fit <- function (x, y, model=c('linear', 'exponential', 'logisti
       f <- function(x) {
         a + b*x.seq
       }
+      
+      result <- list(a = a, b = b, r.squared = r.squared)
     },
     'exponential'={
       estimate <- summary(lm(log(y) ~ x))
@@ -31,18 +36,36 @@ rfin.statistics.fit <- function (x, y, model=c('linear', 'exponential', 'logisti
       f <- function(x) {
         a * (b^x.seq)
       }
+      
+      result <- list(a = a, b = b, r.squared = r.squared)
     },
     'logistic'={
+      estimate.nls <- nls(y ~ SSlogis(x, Asym, xmid, scal))
+      estimate <- summary(estimate.nls)
+      C <- estimate$coef[1]
+      b <- exp(1/estimate$coef[3])
+      a <- exp(estimate$coef[2] * b)
       
+      
+      error.total <- sum( (y - mean(y))^2 )
+      error.estimate <- sum( estimate$residuals^2 )
+      r.squared<- 1 - error.estimate/error.total
+      
+      f <- function(x) {
+        predict(estimate.nls, data.frame(x))
+      }
+      result <- list(C = C, a = a, b = b, r.squared = r.squared)
+    },
+    {
+      stop(cat("Unexpected model: ", model))
     }
   )
   
   if (plot) {
     x.seq <- seq(min(x), max(x), length = 100)
-    plot(x, y, main = model, pch = 16, xlab = deparse(substitute(x)), ylab = deparse(substitute(y)))
+    plot(x, y, main = model, pch = 16, xlab = xlab, ylab = ylab)
     lines(x.seq, f(x.seq))
   }    
   
-  #cat(" a = ", round(a, 5), "\n", "b = ", round(b, 5), "\n", "R-squared = ", round(r.squared, 5))
-  return (list(a = a, b = b, r.squared = r.squared))
+  return (result)
 }
