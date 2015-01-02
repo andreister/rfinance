@@ -31,7 +31,7 @@ rfin.statistics.fit <- function (x, y, model=c('linear', 'exponential', 'logisti
       estimate <- summary(lm(log(y) ~ x))
       a <- exp(estimate$coef[1])   #intercept
       b <- exp(estimate$coef[2])   #slope
-      r.squared <- estimate$r.squared
+      r.squared <- estimate$r.squa*ared
       
       f <- function(x) {
         a * (b^x.seq)
@@ -44,15 +44,14 @@ rfin.statistics.fit <- function (x, y, model=c('linear', 'exponential', 'logisti
       estimate <- summary(estimate.nls)
       C <- estimate$coef[1]
       b <- exp(1/estimate$coef[3])
-      a <- exp(estimate$coef[2] * b)
-      
-      
+      a <- exp((estimate$coef[2]) * (1/estimate$coef[3]))
+            
       error.total <- sum( (y - mean(y))^2 )
       error.estimate <- sum( estimate$residuals^2 )
       r.squared<- 1 - error.estimate/error.total
       
       f <- function(x) {
-        predict(estimate.nls, data.frame(x))
+        C / (1 + a*b^(-x))
       }
       result <- list(C = C, a = a, b = b, r.squared = r.squared)
     },
