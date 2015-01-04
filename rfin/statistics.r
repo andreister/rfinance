@@ -22,7 +22,7 @@ rfin.statistics.fit <- function (x, y, model=c('linear', 'exponential', 'logisti
       b <- estimate$coef[2]        #slope
       r.squared <- estimate$r.squared
       f <- function(x) {
-        a + b*x.seq
+        a + b*x
       }
       
       result <- list(a = a, b = b, r.squared = r.squared)
@@ -34,7 +34,7 @@ rfin.statistics.fit <- function (x, y, model=c('linear', 'exponential', 'logisti
       r.squared <- estimate$r.squared
       
       f <- function(x) {
-        a * (b^x.seq)
+        a * (b^x)
       }
       
       result <- list(a = a, b = b, r.squared = r.squared)
